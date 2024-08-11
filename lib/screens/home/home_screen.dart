@@ -89,7 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<NoteModel> get _filteredNotes {
     return _notes.where((note) {
       return note.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          note.description.toLowerCase().contains(_searchQuery.toLowerCase());
+          note.description.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          note.category.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
   }
 
@@ -115,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.black: Colors.orange[50],
+                  color: isDarkMode ? Colors.black : Colors.orange[50],
                   border: Border.all(
                     color: Colors.orange,
                     width: 2.0,
@@ -173,9 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   margin: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 8.0),
                   decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? Colors.black
-                        : Colors.orange[50],
+                    color: isDarkMode ? Colors.black : Colors.orange[50],
                     border: Border.all(
                       color: Colors.orange,
                       width: 2.0,
@@ -186,16 +185,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: Text(
                       note.title,
                       style: TextStyle(
-                          color: isDarkMode
-                              ? Colors.white
-                              : Colors.black),
+                          color: isDarkMode ? Colors.white : Colors.black,
+                          fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Text(
-                      note.description,
-                      style: TextStyle(
-                          color: isDarkMode
-                              ? Colors.white70
-                              : Colors.black87),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          note.description,
+                          style: TextStyle(
+                              color:
+                                  isDarkMode ? Colors.white70 : Colors.black87),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Category: ${note.category}',
+                          style: TextStyle(
+                              color: isDarkMode
+                                  ? Colors.orange
+                                  : Colors.orange[800],
+                              fontStyle: FontStyle.italic),
+                        ),
+                      ],
                     ),
                     leading: IconButton(
                       icon: Icon(
@@ -207,8 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () => _togglePin(note),
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete,
-                          color: Colors.orange),
+                      icon: const Icon(Icons.delete, color: Colors.orange),
                       onPressed: () => _deleteNote(note),
                     ),
                     onTap: () => _addOrEditNote(note),
@@ -282,7 +294,8 @@ class NoteSearchDelegate extends SearchDelegate<NoteModel?> {
         ? notes
         : notes.where((note) {
             return note.title.toLowerCase().contains(query.toLowerCase()) ||
-                note.description.toLowerCase().contains(query.toLowerCase());
+                note.description.toLowerCase().contains(query.toLowerCase()) ||
+                note.category.toLowerCase().contains(query.toLowerCase());
           }).toList();
 
     return ListView.builder(
@@ -291,7 +304,19 @@ class NoteSearchDelegate extends SearchDelegate<NoteModel?> {
         final note = suggestionList[index];
         return ListTile(
           title: Text(note.title),
-          subtitle: Text(note.description),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(note.description),
+              Text(
+                'Category: ${note.category}',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.orange : Colors.orange[800],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
           onTap: () {
             onSelectNote(note);
             close(context, note);
